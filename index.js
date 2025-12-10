@@ -1,4 +1,6 @@
 import * as THREE from "./three.js/build/three.module.js"
+import { TextGeometry } from "./three.js/examples/jsm/geometries/TextGeometry.js"
+import { FontLoader } from "./three.js/examples/jsm/loaders/FontLoader.js"
 
 let currentCamera, thirdPersonCamera,firstPersonCamera , renderer, scene;
 
@@ -51,10 +53,35 @@ function render(){
     requestAnimationFrame(render);
 }
 
+async function createText(){
+    const fontLoader = new FontLoader();
+    const font = await fontLoader.loadAsync("./three.js/examples/fonts/helvetiker_bold.typeface.json")
+
+    const textGeometry = new TextGeometry("OVerlord",{
+        font:font,
+        size:1,
+        height:0.2,
+        depth:1
+    });
+
+    const textMaterial = new THREE.MeshStandardMaterial({
+        color:0xFFFFFF
+    });
+
+    const textMesh = new THREE.Mesh(textGeometry,textMaterial);
+
+    textMesh.position.set(-6, 4, 5)
+    textMesh.rotateY(Math.PI/2)
+
+    scene.add(textMesh)
+}
+
 function loader(){
     init();
 
     createLighting();
+
+    createText();
     render();
 }
 
