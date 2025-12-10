@@ -1,6 +1,8 @@
-import * as THREE from "./three.js-r145/build/three.module.js"
+import * as THREE from "./three.js/build/three.module.js"
 
 let currentCamera, thirdPersonCamera,firstPersonCamera , renderer, scene;
+
+let spellEffect;
 
 function init () {
     const width = window.innerWidth;
@@ -27,16 +29,21 @@ function init () {
 }
 
 function createLighting(){
-    let ambient = new THREE.AmbientLight(0xffffff,0.7);
-    let spotlight = new THREE.SpotLight(0xffffff,1.2);
+    let ambientLight = new THREE.AmbientLight(0xFFFFFF,0.7);
 
-    spotlight.castShadow = true;
-    scene.add(ambient,spotlight);
-
-}
-
-function createGround(){
+    let spotLight = new THREE.SpotLight(0xFFFFFF,1.2,1000);
+    spotLight.position.set(0,10,0)
+    spotLight.castShadow = true;
+    spotLight.shadow.mapSize.width = 2048
+    spotLight.shadow.mapSize.height = 2048
     
+    let directionalLight = new THREE.DirectionalLight(0xFFFFEE,0.5)
+    directionalLight.position.set(5,2,8)
+
+    spellEffect = new THREE.PointLight(0xFFD700,2,3)
+
+    scene.add(ambientLight,spotLight,directionalLight,spellEffect);
+
 }
 
 function render(){
