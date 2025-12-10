@@ -4,8 +4,6 @@ import { FontLoader } from "./three.js/examples/jsm/loaders/FontLoader.js"
 
 let currentCamera, thirdPersonCamera,firstPersonCamera , renderer, scene;
 
-let spellEffect;
-
 function init () {
     const width = window.innerWidth;
     const height = window.innerHeight;
@@ -42,9 +40,12 @@ function createLighting(){
     let directionalLight = new THREE.DirectionalLight(0xFFFFEE,0.5)
     directionalLight.position.set(5,2,8)
 
-    spellEffect = new THREE.PointLight(0xFFD700,2,3)
+    let spellEffect = new THREE.PointLight(0xFFD700,2,3)
+    spellEffect.position.set(0,0.5,0)
 
     scene.add(ambientLight,spotLight,directionalLight,spellEffect);
+
+    //darkWarrior.add(spellEffect)
 
 }
 
