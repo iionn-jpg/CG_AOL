@@ -87,7 +87,7 @@ async function createHamster(){
         map: currentFace
     });
 
-    const bodyMaterialArray = [sideMaterial,sideMaterial,backMaterial.clone(),miscMaterial,faceMaterial,backMaterial.clone()];
+    const bodyMaterialArray = [sideMaterial,sideMaterial,backMaterial,miscMaterial,faceMaterial,backMaterial];
 
     const bodyGeometry = new THREE.BoxGeometry(2,2,2);
 
@@ -238,8 +238,8 @@ function swapFace(){
 }
 
 function clickHandler(e){
-    const width = Math.floor(innerWidth / 2);
-    const height = Math.floor(innerHeight / 2);
+    const width = Math.floor(window.innerWidth / 2);
+    const height = Math.floor(window.innerHeight / 2);
     
     const clickLocationX = (e.clientX - width) / width;
     const clickLocationY = (height - e.clientY) / height;
@@ -257,6 +257,39 @@ function clickHandler(e){
 
 }
 
+function moveCharacter(direction,rotation){
+    darkWarrior.translateZ(direction.z)
+    darkWarrior.translateZ(direction.x)
+    darkWarrior.rotateY(rotation)
+}
+
+function keyHandler(e){
+    const key = e.key
+    switch(key){
+        case "w":
+            moveCharacter(new THREE.Vector3(0,0,1),0)
+            break;
+        case "s":
+            moveCharacter(new THREE.Vector3(0,0,-1),0)
+            break;
+        case "d":
+            moveCharacter(new THREE.Vector3(1,0,0),0)
+            break;
+        case "a":
+            moveCharacter(new THREE.Vector3(-1,0,0),0)
+            break;
+        case "q":
+            moveCharacter(new THREE.Vector3(0,0,0),0.05)
+            break;
+        case "e":
+            moveCharacter(new THREE.Vector3(0,0,0),-0.05)
+            break;
+        default:
+            console.log(key)
+    }
+}
+
 addEventListener("load",loader);
 addEventListener("resize",resizer)
 addEventListener("click",clickHandler);
+addEventListener("keypress",keyHandler)
