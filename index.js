@@ -171,10 +171,12 @@ async function createText(){
     scene.add(textMesh)
 }
 
+//entry point
 async function loader(){
     init();
 
     createLighting();
+    await createWarrior()
     await createHamster();
     await createTrees()
     await createText();
@@ -286,7 +288,7 @@ function clickHandler(e){
 
 function moveCharacter(direction,rotation){
     darkWarrior.translateZ(direction.z)
-    darkWarrior.translateZ(direction.x)
+    darkWarrior.translateX(direction.x)
     darkWarrior.rotateY(rotation)
 }
 
