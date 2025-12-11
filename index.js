@@ -1,6 +1,7 @@
 import * as THREE from "./three.js/build/three.module.js"
 import { TextGeometry } from "./three.js/examples/jsm/geometries/TextGeometry.js"
 import { FontLoader } from "./three.js/examples/jsm/loaders/FontLoader.js"
+import {GLTFLoader} from "./three.js/examples/jsm/loaders/GLTFLoader.js"
 
 let currentCamera, thirdPersonCamera,firstPersonCamera , renderer, scene;
 let currentFace, sadFace, happyFace;
@@ -213,6 +214,28 @@ async function createTree(x,z){
     upperLeafMesh.position.set(x,6,z)
 
     scene.add(trunkMesh,lowerLeafMesh,upperLeafMesh)
+
+}
+
+async function createWarrior () {
+    let loaderModel = new GLTFLoader()
+
+    const gltf = await loaderModel.loadAsync("./models/momonga_ainz_ooal_gown/scene.gltf")
+
+    darkWarrior = gltf.scene; 
+
+    darkWarrior.position.set(0,-0.01,3) 
+    darkWarrior.scale.set(0.01, 0.01, 0.01) 
+    darkWarrior.rotation.set(0, Math.PI/2, 0) 
+
+    darkWarrior.traverse(object => {
+        if(object.isMesh){
+            object.castShadow = true
+            object.receiveShadow = true 
+        }
+    })
+
+    scene.add(darkWarrior)
 
 }
 
