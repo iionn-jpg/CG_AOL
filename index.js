@@ -7,6 +7,9 @@ let currentFace, sadFace, happyFace;
 let faceMaterial;
 
 let hamster;
+let darkWarrior;
+let spell = [];
+
 
 function init () {
     const width = window.innerWidth;
@@ -49,6 +52,7 @@ function createLighting(){
 
     scene.add(ambientLight,spotLight,directionalLight,spellEffect);
     try {
+        spell.push(spellEffect)
         darkWarrior.add(spellEffect)
     } catch {
         
@@ -263,6 +267,13 @@ function moveCharacter(direction,rotation){
     darkWarrior.rotateY(rotation)
 }
 
+function toggleSpell(){
+    
+    spell.forEach(element => {
+        element.enabled = !(element.enabled)
+    });
+}
+
 function keyHandler(e){
     const key = e.key
     switch(key){
@@ -284,6 +295,8 @@ function keyHandler(e){
         case "e":
             moveCharacter(new THREE.Vector3(0,0,0),-0.05)
             break;
+        case " ":
+            toggleSpell()
         default:
             console.log(key)
     }
