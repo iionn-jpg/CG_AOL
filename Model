@@ -1,0 +1,205 @@
+import * as THREE from "../three.js-r145/build/three.module.js"
+import { OrbitControls } from "../three.js-r145/examples/jsm/controls/OrbitControls.js"
+import { GLTFLoader } from "../three.js-r145/examples/jsm/loaders/GLTFLoader.js"
+
+let scene, camera, renderer
+
+let darkWarrior;
+const movSpeed = 0.1;
+const rotSpeed = 0.05;
+
+let keys = {};
+
+let spellGroup
+let spellVisible = false;
+
+let init = () => {
+    scene = new THREE.Scene()
+
+    let w = window.innerWidth
+    let h = window.innerHeight
+    let aspect = w/h
+    camera = new THREE.PerspectiveCamera(75, aspect, 0.1, 1000)
+    camera.position.set(6, 3, 5)
+
+    renderer = new THREE.WebGL1Renderer()
+    renderer.setSize(w, h)
+    document.body.appendChild(renderer.domElement)
+
+    let control = new OrbitControls (camera, renderer.domElement)
+}
+
+let load3D = url => {
+    let loader = new GLTFLoader()
+
+    loader.load(url, (gltf)=>{
+        let darkWarrior = gltf.scene
+        darkWarrior.castShadow = true
+        darkWarrior.receiveShadow = true
+
+        darkWarrior.scale.set(0.01, 0.01, 0.01)
+
+        darkWarrior.position.set(0, -0.01, 3)
+
+        darkWarrior.rotation.set(0, Math.PI / 2, 0)
+
+        darkWarrior.traverse((child)=>{
+            if (child.isMesh){
+                child.castShadow = true
+                child.receiveShadow = true
+            }
+        });
+
+        scene.add(darkWarrior)
+    })
+    
+}
+
+document.addEventListener("keydown", e => keys[e.key.toLowerCase()] = true)
+document.addEventListener("keyup",   e => keys[e.key.toLowerCase()] = false)
+
+function updateDarkWarrior() {
+    if (!darkWarrior) return;
+
+    // WASD movement
+    if (keys['w']) {
+        darkWarrior.position.x -= Math.sin(darkWarrior.rotation.y) * moveSpeed
+        darkWarrior.position.z -= Math.cos(darkWarrior.rotation.y) * moveSpeed
+    }
+    if (keys['s']) {
+        darkWarrior.position.x += Math.sin(darkWarrior.rotation.y) * moveSpeed
+        darkWarrior.position.z += Math.cos(darkWarrior.rotation.y) * moveSpeed
+    }
+    if (keys['a']) {
+        darkWarrior.position.x -= Math.cos(darkWarrior.rotation.y) * moveSpeed
+        darkWarrior.position.z += Math.sin(darkWarrior.rotation.y) * moveSpeed
+    }
+    if (keys['d']) {
+        darkWarrior.position.x += Math.cos(darkWarrior.rotation.y) * moveSpeed
+        darkWarrior.position.z -= Math.sin(darkWarrior.rotation.y) * moveSpeed
+    }
+
+    // Q/E rotation
+    if (keys['q']) {
+        darkWarrior.rotation.y += rotSpeed
+    }
+    if (keys['e']) {
+        darkWarrior.rotation.y -= rotSpeed
+    }
+}
+
+const spellMaterial = new THREE.MeshPhongMaterial({
+    color: 0xDAA520,
+    emissive: 0xFFCC00,
+    emissiveIntensity: 2,
+    shininess: 100,
+    transparent: true,
+    opacity: 0.8,
+    side: THREE.DoubleSide
+});
+
+function loadSpellCircle() {
+
+    spellGroup = new THREE.Group();
+    spellGroup.visible = false;
+
+    // INNER RING
+    let innerGeo = new THREE.RingGeometry(1, 1.2, 64);
+    let innerRing = new THREE.Mesh(innerGeo, spellMaterial.clone());
+    innerRing.rotation.set(Math.PI / 2, 0, 0);
+    innerRing.position.set(0, 0.02, 0);
+    spellGroup.add(innerRing);
+
+    // OUTER RING
+    let outerGeo = new THREE.RingGeometry(1.8, 2, 64);
+    let outerRing = new THREE.Mesh(outerGeo, spellMaterial.clone());
+    outerRing.rotation.set(Math.PI / 2, 0, 0);
+    outerRing.position.set(0, 0.02, 0);
+    spellGroup.add(outerRing);
+
+    // POINTER 1
+    let pointerGeo = new THREE.BoxGeometry(0.05, 4, 0.01);
+    let pointer1 = new THREE.Mesh(pointerGeo, spellMaterial.clone());
+    pointer1.position.set(0, 0.01, 0);
+    pointer1.rotation.set(Math.PI / 2, 0, Math.PI / 2);
+    spellGroup.add(pointer1);
+
+    // POINTER 2 
+    let pointer2 = new THREE.Mesh(pointerGeo, spellMaterial.clone());
+    pointer2.position.set(0, 0.01, 0);
+    pointer2.rotation.set(Math.PI / 2, 0, Math.PI / 2);
+    pointer2.rotateY(Math.PI);   
+    spellGroup.add(pointer2);
+
+    scene.add(spellGroup);
+}
+
+function toggleSpell() {
+    if (!spellGroup) return;
+    spellVisible = !spellVisible;
+    spellGroup.visible = spellVisible;
+}
+
+function updateSpellPosition() {
+    if (!spellGroup || !darkWarrior) return;
+
+    spellGroup.position.set(
+        darkWarrior.position.x,
+        darkWarrior.position.y - 0.01,
+        darkWarrior.position.z
+    );
+}
+
+document.addEventListener("keydown", e => {
+    keys[e.key.toLowerCase()] = true;
+
+    if (e.code === "Space") {
+        toggleSpell();
+    }
+});
+
+
+
+let generateSkybox = () =>{
+    let right = new THREE.TextureLoader().load("../assets/right_sky.jpg")
+    let left = new THREE.TextureLoader().load("../assets/left_sky.jpg")
+    let up = new THREE.TextureLoader().load("../assets/up_sky.png")
+    let down = new THREE.TextureLoader().load("../assets/down_sky.jpg")
+    let front = new THREE.TextureLoader().load("../assets/front_sky.jpg")
+    let back = new THREE.TextureLoader().load("../assets/back_sky.jpg")
+    
+    
+
+    let materialArray = []
+    materialArray.push(new THREE.MeshBasicMaterial({map: right}))
+    materialArray.push(new THREE.MeshBasicMaterial({map: left}))
+    materialArray.push(new THREE.MeshBasicMaterial({map: up}))
+    materialArray.push(new THREE.MeshBasicMaterial({map: down}))
+    materialArray.push(new THREE.MeshBasicMaterial({map: front}))
+    materialArray.push(new THREE.MeshBasicMaterial({map: back}))
+    
+    
+
+    materialArray.forEach(element => {
+        element.side = THREE.BackSide
+    })
+
+    let skyboxGeo = new THREE.BoxGeometry(1200, 1200, 1200)
+    let skybox = new THREE.Mesh(skyboxGeo, materialArray)
+
+    scene.add(skybox)
+}
+
+let render = () => {
+    renderer.render(scene, camera)
+    requestAnimationFrame(render)
+    updateDarkWarrior()
+    updateSpellPosition()
+}
+
+window.onload =  () => {
+    init()
+    load3D("../assets/models/momonga_ainz_ooal_gown/scene.gltf")
+    generateSkybox()
+    render()
+}
